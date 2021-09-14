@@ -1,10 +1,15 @@
 #include "9cc.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 char *user_input;
 Token *token;
 Node *node;
+Node *code[100];
+LVar *locals;
+
+extern bool at_eof();
 
 int main(int argc, char **argv) {
   if (argc != 2) {
@@ -14,19 +19,43 @@ int main(int argc, char **argv) {
 
   user_input = argv[1];
   token = tokenize(user_input);
-  node = parse();
+
+  //fprintf(stderr, "tokenized\n");
+  /*
+  Token *head = token;
+  while(!at_eof()) {
+    fprintf(stderr, "%s\n", token->str);
+    token = token->next;
+  }
+
+  token = head;
+  */
+
+  parse();
+  //fprintf(stderr, "parsed\n");
 
   // アセンブリの最初の部分を出力
   printf(".intel_syntax noprefix\n");
   printf(".globl main\n");
   printf("main:\n");
 
-  // 抽象構文木を下りながらコード生成
-  gen(node);
+  //プロローグ
+  //変数26個分の領域を確保する
+  printf("# prologue\n");
+  printf("  push rbp\n");
+  printf("  mov rbp, rsp\n");
+  printf("  sub rsp, 208\n");
 
-  // スタックトップに式全体の値が残っているはずなので
-  // RAXにそれをロードして関数からの返り値とする
-  printf("  pop rax\n");
+  for (int i = 0; code[i]; i++) {
+    gen(code[i]);
+
+    printf("# end_line\n");
+    printf("  pop rax\n");
+  }
+
+  printf("# epilogue\n");
+  printf("  mov rsp, rbp\n");
+  printf("  pop rbp\n");
   printf("  ret\n");
   return 0;
 }

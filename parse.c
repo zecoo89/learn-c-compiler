@@ -6,19 +6,27 @@
 #include <string.h>
 #include <stdarg.h>
 
-extern char *user_input;
 extern Token *token;
+extern LVar *locals;
+extern void error_at(char *, char *, ...);
 
 Node *new_node();
 Node *new_node_num();
 
+bool at_eof();
+
+void program();
+Node *stmt();
 Node *expr();
+Node *assign();
 Node *equality();
 Node *relational();
 Node *add();
 Node *mul();
 Node *unary();
 Node *primary();
+
+LVar *find_lvar(Token *);
 
 Node *new_node(NodeKind kind, Node *lhs, Node *rhs) {
   Node *node = calloc(1, sizeof(Node));
@@ -35,19 +43,6 @@ Node *new_node_num(int val) {
   node->val = val;
 
   return node;
-}
-
-void error_at(char *loc, char *fmt, ...) {
-  va_list ap;
-  va_start(ap, fmt);
-
-  int pos = loc - user_input;
-  fprintf(stderr, "%s\n", user_input);
-  fprintf(stderr, "%*s", pos, " ");
-  fprintf(stderr, "^ ");
-  vfprintf(stderr, fmt, ap);
-  fprintf(stderr, "\n");
-  exit(1);
 }
 
 // エラーを報告する関数
@@ -73,6 +68,16 @@ bool consume(char *op) {
   return true;
 }
 
+Token *consume_ident() {
+  if (token->kind == TK_IDENT) {
+    Token *tok = token;
+    token = token->next;
+    return tok;
+  }
+
+  return NULL;
+}
+
 void expect(char *op) {
   if (token->kind != TK_RESERVED ||
       strlen(op) != token->len ||
@@ -87,6 +92,8 @@ void expect(char *op) {
 // それ以外の場合にはエラーを報告する。
 int expect_number() {
   if (token->kind != TK_NUM) {
+    fprintf(stderr, "%d\n", TK_NUM);
+    fprintf(stderr, "%d\n", token->kind);
     error_at(token->str, "数ではありません");
   }
 
@@ -96,15 +103,59 @@ int expect_number() {
   return val;
 }
 
-Node *parse() {
-  return expr();
+void parse() {
+  program();
+}
+
+extern Node *code[];
+void program() {
+  int i = 0;
+
+  while (!at_eof()) {
+    code[i++] = stmt();
+  }
+
+  code[i] = NULL;
+}
+
+Node *stmt() {
+  Node *node;
+
+  if(token->kind == TK_RETURN) {
+    token = token->next;
+    node = calloc(1, sizeof(Node));
+    node->kind = ND_RETURN;
+    node->lhs = expr();
+  } else {
+    node = expr();
+  }
+
+  expect(";");
+
+  return node;
 }
 
 Node *expr() {
-  return equality();
+  return assign();
+}
+
+Node *assign() {
+  //fprintf(stderr, "assign\n");
+  Node *node = equality();
+
+  for(;;) {
+    if(consume("=")) {
+      node = new_node(ND_ASSIGN, node, assign());
+    } else {
+      return node;
+    }
+  }
+
+  return node;
 }
 
 Node *equality() {
+  //fprintf(stderr, "equality\n");
   Node *node = relational();
 
   for(;;) {
@@ -119,6 +170,7 @@ Node *equality() {
 }
 
 Node *relational() {
+  //fprintf(stderr, "relational\n");
   Node *node = add();
 
   for(;;) {
@@ -177,9 +229,39 @@ Node *unary() {
 }
 
 Node *primary() {
+  //fprintf(stderr, "primary\n");
   if (consume("(")) {
     Node *node = expr();
     expect(")");
+    return node;
+  }
+
+  Token *tok = consume_ident();
+  if (tok) {
+    Node *node = calloc(1, sizeof(Node));
+    node->kind = ND_LVAR;
+
+    LVar *lvar = find_lvar(tok);
+
+    if (lvar) {
+      //既存の変数なので、スタックのoffsetをノードに保存する
+      node->offset = lvar->offset;
+    } else {
+      lvar = calloc(1, sizeof(LVar));
+      lvar->next = locals;
+      lvar->name = tok->str;
+      lvar->len = tok->len;
+      if(locals) {
+        //fprintf(stderr,"%s, %d\n", tok->str,locals->offset);
+        lvar->offset = locals->offset + 8;
+      } else {
+        lvar->offset = 8;
+      }
+      node->offset = lvar->offset;
+    }
+
+    locals = lvar;
+
     return node;
   }
 
@@ -190,66 +272,13 @@ bool at_eof() {
   return token->kind == TK_EOF;
 }
 
-Token *new_token(TokenKind kind, Token *cur, char * str, int len) {
-  Token *tok = calloc(1, sizeof(Token));
-  tok->kind = kind;
-  tok->str = str;
-  tok->len = len;
-  cur->next = tok;
-  return tok;
-}
-
-bool startswith(char *p, char *q) {
-  return memcmp(p, q, strlen(q)) == 0;
-}
-
-Token *tokenize(char *p) {
-  Token head;
-  head.next = NULL;
-  Token *cur = &head;
-
-  while (*p) {
-    if (isspace(*p)) {
-      p++;
-      continue;
+LVar *find_lvar(Token *tok) {
+  for (LVar *var = locals; var; var = var->next) {
+    if (var->len == tok->len && !memcmp(tok->str, var->name, var->len)) {
+      return var;
     }
-
-    if(startswith(p, "==") ||
-        startswith(p, "!=") ||
-        startswith(p, "<=") ||
-        startswith(p, ">=")) {
-      cur = new_token(TK_RESERVED, cur, p, 2);
-      p += 2;
-      continue;
-    }
-
-    if (*p == '<' || *p == '>') {
-      cur = new_token(TK_RESERVED, cur, p++, 1);
-      continue;
-    }
-
-    if (*p == '(' || *p == ')') {
-      cur = new_token(TK_RESERVED, cur, p++, 1);
-      continue;
-    }
-
-    if (*p == '+' || *p == '-' || *p == '*'|| *p == '/') {
-      cur = new_token(TK_RESERVED, cur, p++, 1);
-      continue;
-    }
-
-    if (isdigit(*p)) {
-      cur = new_token(TK_NUM, cur, p, 0);
-      char *q = p;
-      cur->val = strtol(p, &p, 10);
-      cur->len = p - q;
-      continue;
-    }
-
-    error_at(p, "トークナイズできません");
   }
 
-  new_token(TK_EOF, cur, p, 0);
-  return head.next;
+  return NULL;
 }
 
