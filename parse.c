@@ -126,6 +126,8 @@ Node *stmt() {
     node = calloc(1, sizeof(Node));
     node->kind = ND_RETURN;
     node->lhs = expr();
+  } else if(token->kind == TK_IF) {
+
   } else {
     node = expr();
   }
