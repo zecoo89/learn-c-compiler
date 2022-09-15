@@ -127,7 +127,10 @@ Node *stmt() {
     node->kind = ND_RETURN;
     node->lhs = expr();
   } else if(token->kind == TK_IF) {
-
+    token = token->next;
+    node = calloc(1, sizeof(Node));
+    node->kind = ND_IF;
+    node->lhs = expr();
   } else {
     node = expr();
   }
@@ -274,6 +277,7 @@ bool at_eof() {
   return token->kind == TK_EOF;
 }
 
+/* find left variable */
 LVar *find_lvar(Token *tok) {
   for (LVar *var = locals; var; var = var->next) {
     if (var->len == tok->len && !memcmp(tok->str, var->name, var->len)) {
