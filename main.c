@@ -29,7 +29,7 @@ int main(int argc, char **argv) {
   }
 
   token = head;
-  */
+  /**/
 
   parse();
   //fprintf(stderr, "parsed\n");

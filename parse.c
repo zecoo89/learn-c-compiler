@@ -82,7 +82,7 @@ void expect(char *op) {
   if (token->kind != TK_RESERVED ||
       strlen(op) != token->len ||
       memcmp(token->str, op, token->len)) {
-      error("'%s'ではありません", op);
+      error("expect: '%s'\nactual: '%s'", op, token->str);
   }
 
   token = token->next;
@@ -130,7 +130,15 @@ Node *stmt() {
     token = token->next;
     node = calloc(1, sizeof(Node));
     node->kind = ND_IF;
-    node->lhs = expr();
+    expect("(");
+    node->cond = expr();
+    expect(")");
+    node->lhs = stmt();
+
+    if(consume("else")) {
+      node->rhs = stmt();
+    }
+    return node;
   } else {
     node = expr();
   }

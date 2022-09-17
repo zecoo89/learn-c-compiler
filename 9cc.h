@@ -33,6 +33,8 @@ typedef enum {
   ND_LT, // <
   ND_LE, // <
   ND_RETURN, // return
+  ND_IF, // if,
+  ND_ELSE,
 } NodeKind;
 
 typedef struct Node Node;
@@ -44,6 +46,8 @@ struct Node {
   Node * rhs;
   int val;
   int offset;
+
+  Node *cond;
 };
 
 typedef struct LVar LVar;
