@@ -35,7 +35,9 @@ typedef enum {
   ND_LE, // <
   ND_RETURN, // return
   ND_IF, // if,
-  ND_ELSE,
+  ND_ELSE, // else,
+  ND_WHILE, // while
+  ND_FOR, // for
 } NodeKind;
 
 typedef struct Node Node;

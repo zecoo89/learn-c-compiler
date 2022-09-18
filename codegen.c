@@ -18,13 +18,13 @@ void gen(Node *node) {
       gen(node->cond);
       printf("  pop rax\n");
       printf("  cmp rax, 0\n");
-      printf("  je  .LelseXXX\n");
+      printf("  je  .Lelse\n");
       gen(node->lhs);
-      printf("  jmp .LendXXX\n");
-      printf(".LelseXXX:\n");
+      printf("  jmp .Lend\n");
+      printf(".Lelse:\n");
       if(node->rhs)
         gen(node->rhs);
-      printf(".LendXXX:\n");
+      printf(".Lend:\n");
       return;
     case ND_RETURN:
       gen(node->lhs);

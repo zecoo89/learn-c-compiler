@@ -37,9 +37,9 @@ int main(int argc, char **argv) {
   // アセンブリの最初の部分を出力
   printf(".intel_syntax noprefix\n");
   printf(".globl main\n");
-  printf(".globl _main\n");
+  printf(".globl _main\n"); // for Mac support
   printf("main:\n");
-  printf("_main:\n");
+  printf("_main:\n"); // for Mac support
 
   //プロローグ
   //変数26個分の領域を確保する
