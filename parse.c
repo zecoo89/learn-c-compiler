@@ -58,6 +58,10 @@ void error(char *fmt, ...) {
 // 次のトークンが期待している記号のときには、トークンを一つ読み進め、
 // 真を返す、それ以外は偽を返す。
 bool consume(char *op) {
+  //fprintf(stderr, "op: %s\n", op);
+  //fprintf(stderr, "token->len: %d\n", token->len);
+  //fprintf(stderr, "token->kind: %d\n", token->kind);
+  //fprintf(stderr, "token->str: %s\n", token->str);
   if (token->kind != TK_RESERVED ||
       strlen(op) != token->len ||
       memcmp(token->str, op, token->len)) {
@@ -79,10 +83,14 @@ Token *consume_ident() {
 }
 
 void expect(char *op) {
+  //fprintf(stderr, "token->kind = %d\n", token->kind);
+  //fprintf(stderr, "token->len = %d\n", token->len);
+  //fprintf(stderr, "token->str = '%s'\n", token->str);
+  //fprintf(stderr, "strlen(op) = %ld\n", strlen(op));
   if (token->kind != TK_RESERVED ||
       strlen(op) != token->len ||
       memcmp(token->str, op, token->len)) {
-      error("expect: '%s'\nactual: '%s'", op, token->str);
+    error("expect: '%s'\nactual: '%s'", op, token->str);
   }
 
   token = token->next;
@@ -92,8 +100,9 @@ void expect(char *op) {
 // それ以外の場合にはエラーを報告する。
 int expect_number() {
   if (token->kind != TK_NUM) {
-    fprintf(stderr, "%d\n", TK_NUM);
-    fprintf(stderr, "%d\n", token->kind);
+    fprintf(stderr, "token->kind = %d\n", token->kind);
+    fprintf(stderr, "token->len = %d\n", token->len);
+    fprintf(stderr, "token->str = '%s'\n", token->str);
     error_at(token->str, "数ではありません");
   }
 
@@ -134,8 +143,9 @@ Node *stmt() {
     node->cond = expr();
     expect(")");
     node->lhs = stmt();
-
-    if(consume("else")) {
+    //fprintf(stderr, "[test] %s\n",token->str);
+    if(token->kind == TK_ELSE) {
+      token = token->next;
       node->rhs = stmt();
     }
     return node;
@@ -143,8 +153,8 @@ Node *stmt() {
     node = expr();
   }
 
-  expect(";");
 
+  expect(";");
   return node;
 }
 

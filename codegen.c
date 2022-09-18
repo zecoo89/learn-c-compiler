@@ -14,6 +14,17 @@ void gen_lval(Node *node) {
 
 void gen(Node *node) {
   switch (node->kind) {
+    case ND_IF:
+      gen(node->cond);
+      printf("  pop rax\n");
+      printf("  cmp rax, 0\n");
+      printf("  je  .LelseXXX\n");
+      gen(node->lhs);
+      printf("  jmp .LendXXX\n");
+      printf(".LelseXXX:\n");
+      if(node->rhs)
+        gen(node->rhs);
+      printf(".LendXXX:\n");
     case ND_RETURN:
       gen(node->lhs);
       printf("# RETURN\n");

@@ -80,7 +80,9 @@ Token *tokenize(char *p) {
         cur->kind = TK_RETURN;
       } else if(cur->len == 2 && memcmp("if", q, 2) == 0) {
         cur->kind = TK_IF;
-      } else if(cur->len == 2 && memcmp("while", q, 2) == 0) {
+      } else if(cur->len == 4 && memcmp("else", q, 4) == 0) {
+        cur->kind = TK_ELSE;
+      } else if(cur->len == 5 && memcmp("while", q, 5) == 0) {
         cur->kind = TK_WHILE;
       } else if(cur->len == 2 && memcmp("for", q, 2) == 0) {
         cur->kind = TK_FOR;
