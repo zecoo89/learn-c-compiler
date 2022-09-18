@@ -86,25 +86,25 @@ void gen(Node *node) {
       printf("# EQ\n");
       printf("  cmp rax, rdi\n");
       printf("  sete al\n");
-      printf("  movzb rax, al\n");
+      printf("  movzx rax, al\n");
       break;
     case ND_NE:
       printf("# NE\n");
       printf("  cmp rax, rdi\n");
       printf("  setne al\n");
-      printf("  movzb rax, al\n");
+      printf("  movzx rax, al\n");
       break;
     case ND_LT:
       printf("# ND_LT\n");
       printf("  cmp rax, rdi\n");
       printf("  setl al\n");
-      printf("  movzb rax, al\n");
+      printf("  movzx rax, al\n");
       break;
     case ND_LE:
       printf("# ND_LE\n");
       printf("  cmp rax, rdi\n");
       printf("  setle al\n");
-      printf("  movzb rax, al\n");
+      printf("  movzx rax, al\n");
       break;
   }
 
