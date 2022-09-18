@@ -25,6 +25,7 @@ void gen(Node *node) {
       if(node->rhs)
         gen(node->rhs);
       printf(".LendXXX:\n");
+      return;
     case ND_RETURN:
       gen(node->lhs);
       printf("# RETURN\n");

@@ -48,6 +48,7 @@ assert 3 'a=1;b=2;a+b;'
 assert 11 'return 11;'
 assert 3 'a=1;b=2;return a+b;'
 assert 4 'a=1;b=2;if(a==1) b=4; return b;'
-assert 5 'a=1;b=2;if(a==2) b=4; else b=5; return b;'
+assert 5 'a=1;b=2;if(a==100) b=4; else b=5; return b;'
+assert 4 'a=1;b=2;if(a==1) b=4; else b= 5; return b;'
 
 echo OK
