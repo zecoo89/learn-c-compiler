@@ -12,19 +12,59 @@ void gen_lval(Node *node) {
   printf("  push rax\n");
 }
 
+int label_number = 0;
+
 void gen(Node *node) {
+  int local_label_number = label_number;
+  Node *cur;
+
   switch (node->kind) {
     case ND_IF:
       gen(node->cond);
       printf("  pop rax\n");
       printf("  cmp rax, 0\n");
-      printf("  je  .Lelse\n");
-      gen(node->lhs);
-      printf("  jmp .Lend\n");
-      printf(".Lelse:\n");
-      if(node->rhs)
-        gen(node->rhs);
-      printf(".Lend:\n");
+      printf("  je  .Lelse%d\n", local_label_number);
+      gen(node->then);
+      printf("  jmp .Lend%d\n", local_label_number);
+      printf(".Lelse%d:\n", local_label_number);
+      if(node->els)
+        gen(node->els);
+      printf(".Lend%d:\n", local_label_number);
+      label_number++;
+      return;
+    case ND_WHILE:
+      printf(".Lbegin%d:\n", local_label_number);
+      gen(node->cond);
+      printf("  pop rax\n");
+      printf("  cmp rax, 0\n");
+      printf("  je .Lend%d\n", local_label_number);
+      gen(node->body);
+      printf("  jmp .Lbegin%d\n", local_label_number);
+      printf(".Lend%d:\n", local_label_number);
+      label_number++;
+      return;
+    case ND_FOR:
+      gen(node->init);
+      printf(".Lbegin%d:\n", local_label_number);
+      gen(node->cond);
+      printf("  pop rax\n");
+      printf("  cmp rax, 0\n");
+      printf("  je  .Lend%d\n", local_label_number);
+      gen(node->body);
+      gen(node->inc);
+      printf("  jmp .Lbegin%d\n", local_label_number);
+      printf(".Lend%d:\n", local_label_number);
+      label_number++;
+      return;
+    case ND_BLOCK:
+      cur = node->stmt;
+      while(cur) {
+        gen(cur);
+        //1つ1つのステートメントは1つの値をスタックに残すので、
+        //その値を毎回ポップさせる。
+        printf("  pop rax\n");
+        cur = cur->stmt;
+      }
       return;
     case ND_RETURN:
       gen(node->lhs);
@@ -55,6 +95,8 @@ void gen(Node *node) {
       printf("  mov [rax], rdi\n");
       printf("  push rdi\n");
       return;
+    default:
+      break;
   }
 
 
@@ -105,6 +147,8 @@ void gen(Node *node) {
       printf("  cmp rax, rdi\n");
       printf("  setle al\n");
       printf("  movzx rax, al\n");
+      break;
+    default:
       break;
   }
 

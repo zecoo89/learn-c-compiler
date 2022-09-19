@@ -61,7 +61,9 @@ Token *tokenize(char *p) {
         *p == '<' || *p == '>' ||
         *p == '(' || *p == ')' ||
         *p == '+' || *p == '-' ||
-        *p == '*' || *p == '/') {
+        *p == '*' || *p == '/' ||
+        *p == '{' || *p == '}'
+        ) {
       cur = new_token(TK_RESERVED, cur, p++, 1);
       continue;
     }
@@ -84,7 +86,7 @@ Token *tokenize(char *p) {
         cur->kind = TK_ELSE;
       } else if(cur->len == 5 && memcmp("while", q, 5) == 0) {
         cur->kind = TK_WHILE;
-      } else if(cur->len == 2 && memcmp("for", q, 2) == 0) {
+      } else if(cur->len == 3 && memcmp("for", q, 3) == 0) {
         cur->kind = TK_FOR;
       }
 

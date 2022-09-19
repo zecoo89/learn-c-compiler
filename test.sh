@@ -50,5 +50,9 @@ assert 3 'a=1;b=2;return a+b;'
 assert 4 'a=1;b=2;if(a==1) b=4; return b;'
 assert 5 'a=1;b=2;if(a==100) b=4; else b=5; return b;'
 assert 4 'a=1;b=2;if(a==1) b=4; else b= 5; return b;'
+assert 6 'a=1;while(a<6) a=a+1; return a;'
+assert 7 'a=0;for(i=0;i<7;i=i+1) a=a+1;return a;'
+assert 7 'a=0;for(i=0;i<4000000;i=i+1) a=7;return a;'
+assert 8 '{a=0;b=2;a=8; return a;}'
 
 echo OK

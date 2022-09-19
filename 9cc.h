@@ -38,6 +38,7 @@ typedef enum {
   ND_ELSE, // else,
   ND_WHILE, // while
   ND_FOR, // for
+  ND_BLOCK, //{  }
 } NodeKind;
 
 typedef struct Node Node;
@@ -50,7 +51,18 @@ struct Node {
   int val;
   int offset;
 
+  //if(cond) then else els;
+  // while(cond) body
+  // for(init;cond;inc) body
   Node *cond;
+  Node *then;
+  Node *els;
+  Node *body;
+  Node *init;
+  Node *inc;
+
+  // to represent blocks '{stmt*}'
+  Node *stmt;
 };
 
 typedef struct LVar LVar;

@@ -29,7 +29,7 @@ int main(int argc, char **argv) {
   }
 
   token = head;
-  /**/
+  */
 
   parse();
   //fprintf(stderr, "parsed\n");
@@ -50,7 +50,6 @@ int main(int argc, char **argv) {
 
   for (int i = 0; code[i]; i++) {
     gen(code[i]);
-
     printf("# end_line\n");
     printf("  pop rax\n");
   }

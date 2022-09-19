@@ -142,12 +142,45 @@ Node *stmt() {
     expect("(");
     node->cond = expr();
     expect(")");
-    node->lhs = stmt();
+    node->then = stmt();
     //fprintf(stderr, "[test] %s\n",token->str);
     if(token->kind == TK_ELSE) {
       token = token->next;
-      node->rhs = stmt();
+      node->els = stmt();
     }
+    return node;
+  } else if(token->kind == TK_WHILE) {
+    token = token->next;
+    node = calloc(1, sizeof(Node));
+    node->kind = ND_WHILE;
+    expect("(");
+    node->cond = expr();
+    expect(")");
+    node->body = stmt();
+    return node;
+  } else if(token->kind == TK_FOR) {
+    token = token->next;
+    node = calloc(1, sizeof(Node));
+    node->kind = ND_FOR;
+    expect("(");
+    node->init = expr();
+    expect(";");
+    node->cond = expr();
+    expect(";");
+    node->inc = expr();
+    expect(")");
+    node->body = stmt();
+    return node;
+  } else if(consume("{")) {
+    node = calloc(1, sizeof(Node));
+    node->kind = ND_BLOCK;
+
+    Node *current = node;
+    while(!consume("}")) {
+      current->stmt = stmt();
+      current = current->stmt;
+    }
+
     return node;
   } else {
     node = expr();
