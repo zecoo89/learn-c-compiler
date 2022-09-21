@@ -54,5 +54,6 @@ assert 6 'a=1;while(a<6) a=a+1; return a;'
 assert 7 'a=0;for(i=0;i<7;i=i+1) a=a+1;return a;'
 assert 7 'a=0;for(i=0;i<4000000;i=i+1) a=7;return a;'
 assert 8 '{a=0;b=2;a=8; return a;}'
+assert 9 '{{{return 9;}}}'
 
 echo OK
