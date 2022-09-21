@@ -74,6 +74,35 @@ void print_token_graph(FILE *f) {
   exit(0);
 }
 
+void print_node_arrow(FILE f, Node *node) {
+  fprintf(f, "  node%d[label=\"%s\"]\n", node_id, result1);
+  fprintf(f, "  node%d[label=\"%s\"]\n", node_id+1, result2);
+  fprintf(f, "  node%d -> node%d\n", node_id, node_id+1);
+}
+
+void print_node_graph(FILE *f) {
+  fprintf(f, "digraph tokens {\n");
+  fprintf(f, "  graph [\n    charset = \"UTF-8\"\n    rankdir = LR\n  ];\n");
+
+  Node *node;
+  for (int i = 0; code[i]; i++) {
+    fprintf(f, "%d\n", code[i]->kind);
+    node = code[i];
+
+    switch(node->kind) {
+      case ND_ADD:
+        break;
+      case ND_ASSIGN:
+        // parent node
+        printf(f,"node_[label=\"%s\"]\n",);
+        // node
+        printf(f,"node_[label=\"%s\"]\n", node->lhs);
+    }
+  }
+
+  exit(0);
+}
+
 int main(int argc, char **argv) {
   if (argc != 2) {
     fprintf(stderr, "引数の個数が正しくありません\n");
@@ -84,8 +113,9 @@ int main(int argc, char **argv) {
   token = tokenize(user_input);
 
   //print_tokens(stdout);
-  print_token_graph(stdout);
-  //parse();
+  //print_token_graph(stdout);
+  parse();
+  print_node_graph(stdout);
 
   // アセンブリの最初の部分を出力
   printf(".intel_syntax noprefix\n");
