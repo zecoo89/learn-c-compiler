@@ -297,6 +297,10 @@ Node *primary() {
     Node *node = calloc(1, sizeof(Node));
     node->kind = ND_LVAR;
 
+
+    strncpy(node->var_name, tok->str, tok->len);
+    node->var_name[tok->len] = '\0';
+
     LVar *lvar = find_lvar(tok);
 
     if (lvar) {

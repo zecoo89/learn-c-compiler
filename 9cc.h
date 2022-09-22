@@ -63,6 +63,9 @@ struct Node {
 
   // to represent blocks '{stmt*}'
   Node *stmt;
+
+  // to generate node tree image
+  char var_name[20];
 };
 
 typedef struct LVar LVar;

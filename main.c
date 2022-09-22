@@ -9,6 +9,7 @@ Token *token;
 Node *node;
 Node *code[100];
 LVar *locals;
+int max_node_id = 0;
 
 extern bool at_eof();
 
@@ -74,33 +75,66 @@ void print_token_graph(FILE *f) {
   exit(0);
 }
 
-void print_node_arrow(FILE f, Node *node) {
-  fprintf(f, "  node%d[label=\"%s\"]\n", node_id, result1);
-  fprintf(f, "  node%d[label=\"%s\"]\n", node_id+1, result2);
-  fprintf(f, "  node%d -> node%d\n", node_id, node_id+1);
+char *get_node_kind_string(Node *node){
+  char* num_str = malloc(sizeof(char) * 20);
+
+  switch(node->kind) {
+    case ND_ADD:
+      return "+";
+    case ND_SUB:
+      return "-";
+    case ND_MUL:
+      return "*";
+    case ND_DIV:
+      return "/";
+    case ND_FOR:
+      return "for";
+    case ND_NUM:
+      sprintf(num_str, "%d", node->val);
+      return num_str;
+    case ND_LVAR:
+      return node->var_name;
+    case ND_IF:
+      return "if";
+    case ND_WHILE:
+      return "while";
+    case ND_EQ:
+      return "==";
+    case ND_ASSIGN:
+      return "=";
+    case ND_RETURN:
+      return "return";
+    default:
+      return "";
+  }
 }
 
-void print_node_graph(FILE *f) {
+void print_node_tree(FILE *f, Node *node) {
+  int node_id = max_node_id;
+  // parent node
+  fprintf(f,"node_%d[label=\"%s\"]\n", node_id, get_node_kind_string(node));
+
+  //left child
+  if(node->lhs) {
+    max_node_id++;
+    fprintf(f,"node_%d -> node_%d\n", node_id, max_node_id);
+    print_node_tree(f, node->lhs);
+  }
+  //right child
+  if(node->rhs) {
+    max_node_id++;
+    fprintf(f,"node_%d -> node_%d\n", node_id, max_node_id);
+    print_node_tree(f, node->rhs);
+  }
+}
+
+void print_node_tree_init(FILE *f) {
   fprintf(f, "digraph tokens {\n");
   fprintf(f, "  graph [\n    charset = \"UTF-8\"\n    rankdir = LR\n  ];\n");
+}
 
-  Node *node;
-  for (int i = 0; code[i]; i++) {
-    fprintf(f, "%d\n", code[i]->kind);
-    node = code[i];
-
-    switch(node->kind) {
-      case ND_ADD:
-        break;
-      case ND_ASSIGN:
-        // parent node
-        printf(f,"node_[label=\"%s\"]\n",);
-        // node
-        printf(f,"node_[label=\"%s\"]\n", node->lhs);
-    }
-  }
-
-  exit(0);
+void print_node_tree_end(FILE *f) {
+  fprintf(f, "}");
 }
 
 int main(int argc, char **argv) {
@@ -115,7 +149,14 @@ int main(int argc, char **argv) {
   //print_tokens(stdout);
   //print_token_graph(stdout);
   parse();
-  print_node_graph(stdout);
+  print_node_tree_init(stdout);
+  for(int i=0;code[i];i++) {
+    print_node_tree(stdout, code[i]);
+    max_node_id++;
+  }
+
+  print_node_tree_end(stdout);
+  exit(0);
 
   // アセンブリの最初の部分を出力
   printf(".intel_syntax noprefix\n");
