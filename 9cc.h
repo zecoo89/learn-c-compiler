@@ -31,7 +31,7 @@ typedef enum {
   ND_NUM, // integer
   ND_EQ, // ==
   ND_NE, // !=
-  ND_LT, // <
+  ND_LT, // <=
   ND_LE, // <
   ND_RETURN, // return
   ND_IF, // if,

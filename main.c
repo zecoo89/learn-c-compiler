@@ -100,6 +100,10 @@ char *get_node_kind_string(Node *node){
       return "while";
     case ND_EQ:
       return "==";
+    case ND_LT:
+      return "<";
+    case ND_LE:
+      return "<=";
     case ND_ASSIGN:
       return "=";
     case ND_RETURN:
@@ -112,19 +116,36 @@ char *get_node_kind_string(Node *node){
 void print_node_tree(FILE *f, Node *node) {
   int node_id = max_node_id;
   // parent node
-  fprintf(f,"node_%d[label=\"%s\"]\n", node_id, get_node_kind_string(node));
-
-  //left child
-  if(node->lhs) {
+  if(node->kind == ND_IF) {
+    fprintf(f,"node_%d[label=\"<if>%s|<cond>cond|<then>then\",shape=\"record\"]\n", node_id, get_node_kind_string(node));
     max_node_id++;
-    fprintf(f,"node_%d -> node_%d\n", node_id, max_node_id);
-    print_node_tree(f, node->lhs);
-  }
-  //right child
-  if(node->rhs) {
+    fprintf(f,"node_%d:cond -> node_%d\n", node_id, max_node_id);
+    print_node_tree(f, node->cond);
     max_node_id++;
-    fprintf(f,"node_%d -> node_%d\n", node_id, max_node_id);
-    print_node_tree(f, node->rhs);
+    fprintf(f,"node_%d:then -> node_%d\n", node_id, max_node_id);
+    print_node_tree(f, node->then);
+  } else if(node->kind == ND_WHILE) {
+    fprintf(f,"node_%d[label=\"<while>%s|<cond>cond|<body>body\",shape=\"record\"]\n", node_id, get_node_kind_string(node));
+      max_node_id++;
+      fprintf(f,"node_%d:cond -> node_%d\n", node_id, max_node_id);
+      print_node_tree(f, node->cond);
+      max_node_id++;
+      fprintf(f,"node_%d:body -> node_%d\n", node_id, max_node_id);
+      print_node_tree(f, node->body);
+  } else {
+    fprintf(f,"node_%d[label=\"%s\"]\n", node_id, get_node_kind_string(node));
+    //left child
+    if(node->lhs) {
+      max_node_id++;
+      fprintf(f,"node_%d -> node_%d\n", node_id, max_node_id);
+      print_node_tree(f, node->lhs);
+    }
+    //right child
+    if(node->rhs) {
+      max_node_id++;
+      fprintf(f,"node_%d -> node_%d\n", node_id, max_node_id);
+      print_node_tree(f, node->rhs);
+    }
   }
 }
 
@@ -134,7 +155,7 @@ void print_node_tree_init(FILE *f) {
 }
 
 void print_node_tree_end(FILE *f) {
-  fprintf(f, "}");
+  fprintf(f, "}\n");
 }
 
 int main(int argc, char **argv) {
