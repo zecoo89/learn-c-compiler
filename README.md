@@ -11,19 +11,19 @@ This repository is to learn 8cc.
 ```
 
 # 9cc's usage
-## compile to assembly code.
+ compile to assembly code.
 ```sh
 % ./9cc 'a=1;b=1;return a+b;' > tmp.s
 ```
-## compile to binary.
+ compile to binary.
 ```sh
 % cc -o tmp tmp.s
 ```
-## execute binary
+ execute binary
 ```sh
 % ./tmp
 ```
-## echo a last return value.
+ echo a last return value.
 ```sh
 % echo $?
 ```
