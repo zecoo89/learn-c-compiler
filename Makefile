@@ -11,6 +11,8 @@ print_token: $(OBJS)
 print_node_tree: $(OBJS)
 	$(CC) -o print_node_tree $(filter-out main.o print_token.o, $(OBJS)) $(LDFLAGS)
 
+all: 9cc print_token print_node_tree
+
 $(OBJS): 9cc.h
 
 test: 9cc
