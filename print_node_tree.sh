@@ -1,4 +1,4 @@
-#!/bin/env bash
+#!/usr/bin/env bash
 
 ./print_node_tree $1 > node_tree.dot
 
