@@ -28,6 +28,15 @@ Node *primary();
 
 LVar *find_lvar(Token *);
 
+// alternative of strndup
+char * dup(char *str, int len) {
+  char *buf = malloc(len + 1);
+  memcpy(buf, str, len);
+  buf[len] = '\0';
+
+  return buf;
+}
+
 Node *new_node(NodeKind kind, Node *lhs, Node *rhs) {
   Node *node = calloc(1, sizeof(Node));
   node->kind = kind;
@@ -284,6 +293,15 @@ Node *unary() {
   return primary();
 }
 
+
+Node* function_call(Token *t) {
+  Node *node = calloc(1, sizeof(Node));
+  node->kind = ND_CALL;
+  node->name = dup(t->str, t->len);
+
+  return node;
+}
+
 Node *primary() {
   //fprintf(stderr, "primary\n");
   if (consume("(")) {
@@ -294,12 +312,13 @@ Node *primary() {
 
   Token *tok = consume_ident();
   if (tok) {
+    // function call
+    if(consume("(")) {
+      return function_call(tok);
+    }
     Node *node = calloc(1, sizeof(Node));
     node->kind = ND_LVAR;
-
-
-    strncpy(node->var_name, tok->str, tok->len);
-    node->var_name[tok->len] = '\0';
+    node->name = dup(tok->str, tok->len);
 
     LVar *lvar = find_lvar(tok);
 

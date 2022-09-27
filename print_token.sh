@@ -1,5 +1,20 @@
 #!/bin/env bash
 
+echo $1
 ./print_token $1 > token.dot
-dot -Tpng token.dot -o token.png
-echo 'token.png generated.'
+
+if [ $? == 0 ]; then
+  echo 'print_token successed.'
+  dot -Tpng token.dot -o token.png
+else
+  echo 'print_token failed.'
+  exit 1
+fi
+
+if [ $? == 0 ]; then
+  echo 'token.png generated.'
+  rm ./token.dot
+else
+  echo 'compiling dot file was failed.'
+  exit 1
+fi

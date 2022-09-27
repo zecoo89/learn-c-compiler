@@ -38,7 +38,8 @@ typedef enum {
   ND_ELSE, // else,
   ND_WHILE, // while
   ND_FOR, // for
-  ND_BLOCK, //{  }
+  ND_BLOCK, //{  },
+  ND_CALL,
 } NodeKind;
 
 typedef struct Node Node;
@@ -61,11 +62,11 @@ struct Node {
   Node *init;
   Node *inc;
 
+  char *name; // function name or variable name
+
   // to represent blocks '{stmt*}'
   Node *stmt;
 
-  // to generate node tree image
-  char var_name[20];
 };
 
 typedef struct LVar LVar;

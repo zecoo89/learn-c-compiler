@@ -78,6 +78,8 @@ Token *tokenize(char *p) {
 
       cur->len = p - q;
 
+      //TODO ident()
+
       if(cur->len == 6 && memcmp("return", q, 6) == 0) {
         cur->kind = TK_RETURN;
       } else if(cur->len == 2 && memcmp("if", q, 2) == 0) {

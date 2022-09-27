@@ -31,7 +31,7 @@ char *get_node_kind_string(Node *node){
       sprintf(num_str, "%d", node->val);
       return num_str;
     case ND_LVAR:
-      return node->var_name;
+      return node->name;
     case ND_IF:
       return "if";
     case ND_WHILE:
