@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
-echo $1
-./print_token $1 > token.dot
+./print_token "$1" > token.dot
 
 if [ $? == 0 ]; then
   echo 'print_token successed.'

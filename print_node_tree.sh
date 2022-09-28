@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-./print_node_tree $1 > node_tree.dot
+./print_node_tree "$1" > node_tree.dot
 
 if [ $? == 0 ]; then
   echo 'print_token successed.'
