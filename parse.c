@@ -141,13 +141,10 @@ Node *stmt() {
 
   if(token->kind == TK_RETURN) {
     token = token->next;
-    node = calloc(1, sizeof(Node));
-    node->kind = ND_RETURN;
-    node->lhs = expr();
+    node = new_node(ND_RETURN, expr(), NULL);
   } else if(token->kind == TK_IF) {
     token = token->next;
-    node = calloc(1, sizeof(Node));
-    node->kind = ND_IF;
+    node = new_node(ND_IF, NULL, NULL);
     expect("(");
     node->cond = expr();
     expect(")");
@@ -160,8 +157,7 @@ Node *stmt() {
     return node;
   } else if(token->kind == TK_WHILE) {
     token = token->next;
-    node = calloc(1, sizeof(Node));
-    node->kind = ND_WHILE;
+    node = new_node(ND_WHILE, NULL, NULL);
     expect("(");
     node->cond = expr();
     expect(")");
@@ -169,8 +165,7 @@ Node *stmt() {
     return node;
   } else if(token->kind == TK_FOR) {
     token = token->next;
-    node = calloc(1, sizeof(Node));
-    node->kind = ND_FOR;
+    node = new_node(ND_FOR, NULL, NULL);
     expect("(");
     node->init = expr();
     expect(";");
@@ -181,8 +176,7 @@ Node *stmt() {
     node->body = stmt();
     return node;
   } else if(consume("{")) {
-    node = calloc(1, sizeof(Node));
-    node->kind = ND_BLOCK;
+    node = new_node(ND_BLOCK, NULL, NULL);
 
     Node *current = node;
     while(!consume("}")) {
@@ -295,9 +289,12 @@ Node *unary() {
 
 
 Node* function_call(Token *t) {
-  Node *node = calloc(1, sizeof(Node));
-  node->kind = ND_CALL;
+  Node *node = new_node(ND_CALL, NULL, NULL);
   node->name = dup(t->str, t->len);
+
+  //TODO 引数に対応する
+
+  expect(")");
 
   return node;
 }
