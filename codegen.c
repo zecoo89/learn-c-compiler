@@ -1,6 +1,53 @@
 #include "9cc.h"
 #include <stdio.h>
 
+#ifdef MAC_FLAG
+#define MOVZXXX "movzx"
+#else
+#define MOVZXXX "movzb"
+#endif
+
+extern Node *func_head;
+extern Node *func_tail;
+
+void gen_prologue() {
+  // アセンブリの最初の部分を出力
+  printf(".intel_syntax noprefix\n");
+
+#ifdef MAC_FLAG
+  printf(".globl _main");
+#else
+  printf(".globl main");
+#endif
+  if (func_head) {
+    while(func_head) {
+      printf(", %s", func_head->name);
+      func_head = func_head->next_func;
+    }
+  }
+  printf("\n");
+
+#ifdef MAC_FLAG
+  printf("_main:\n"); // for Mac support
+#else
+  printf("main:\n");
+#endif
+
+  //プロローグ
+  //変数26個分の領域を確保する
+  printf("# prologue\n");
+  printf("  push rbp\n");
+  printf("  mov rbp, rsp\n");
+  printf("  sub rsp, 208\n");
+}
+
+void gen_epilogue() {
+  printf("# epilogue\n");
+  printf("  mov rsp, rbp\n");
+  printf("  pop rbp\n");
+  printf("  ret\n");
+}
+
 void gen_lval(Node *node) {
   if (node->kind != ND_LVAR) {
     error("代入の左辺値が変数ではありません");
@@ -20,7 +67,11 @@ void gen(Node *node) {
 
   switch (node->kind) {
     case ND_CALL:
+#ifdef OS_FLAG
       printf("  call %s\n", node->name);
+#else
+      printf("  call _%s\n", node->name);
+#endif
       return;
     case ND_IF:
       gen(node->cond);
@@ -131,25 +182,25 @@ void gen(Node *node) {
       printf("# EQ\n");
       printf("  cmp rax, rdi\n");
       printf("  sete al\n");
-      printf("  movzx rax, al\n");
+      printf("  %s rax, al\n", MOVZXXX);
       break;
     case ND_NE:
       printf("# NE\n");
       printf("  cmp rax, rdi\n");
       printf("  setne al\n");
-      printf("  movzx rax, al\n");
+      printf("  %s rax, al\n", MOVZXXX);
       break;
     case ND_LT:
       printf("# ND_LT\n");
       printf("  cmp rax, rdi\n");
       printf("  setl al\n");
-      printf("  movzx rax, al\n");
+      printf("  %s rax, al\n", MOVZXXX);
       break;
     case ND_LE:
       printf("# ND_LE\n");
       printf("  cmp rax, rdi\n");
       printf("  setle al\n");
-      printf("  movzx rax, al\n");
+      printf("  %s rax, al\n", MOVZXXX);
       break;
     default:
       break;
