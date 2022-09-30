@@ -7,6 +7,8 @@
 char *user_input;
 Token *token;
 Node *node;
+Node *func_head;
+Node *func_tail;
 Node *code[100];
 LVar *locals;
 int max_node_id = 0;
@@ -26,8 +28,16 @@ int main(int argc, char **argv) {
 
   // アセンブリの最初の部分を出力
   printf(".intel_syntax noprefix\n");
-  printf(".globl main\n");
-  printf(".globl _main\n"); // for Mac support
+  printf(".globl main, _main");
+  if (func_head) {
+    while(func_head) {
+      printf(", %s", func_head->name);
+      func_head = func_head->next_func;
+    }
+  }
+  printf("\n");
+
+  //printf(".globl _main\n"); // for Mac support
   printf("main:\n");
   printf("_main:\n"); // for Mac support
 

@@ -67,6 +67,8 @@ struct Node {
   // to represent blocks '{stmt*}'
   Node *stmt;
 
+  // to make function list
+  Node *next_func;
 };
 
 typedef struct LVar LVar;

@@ -19,6 +19,9 @@ void gen(Node *node) {
   Node *cur;
 
   switch (node->kind) {
+    case ND_CALL:
+      printf("  call %s\n", node->name);
+      return;
     case ND_IF:
       gen(node->cond);
       printf("  pop rax\n");

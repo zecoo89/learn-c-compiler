@@ -9,6 +9,8 @@
 extern Token *token;
 extern LVar *locals;
 extern void error_at(char *, char *, ...);
+Node *func_head;
+Node *func_tail;
 
 Node *new_node();
 Node *new_node_num();
@@ -291,6 +293,14 @@ Node *unary() {
 Node* function_call(Token *t) {
   Node *node = new_node(ND_CALL, NULL, NULL);
   node->name = dup(t->str, t->len);
+
+  if(func_head) {
+    func_tail->next_func = node;
+    func_tail = node;
+  }else {
+    func_head = node;
+    func_tail = node;
+  }
 
   //TODO 引数に対応する
 
