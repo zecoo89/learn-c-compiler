@@ -41,5 +41,5 @@ This repository is to learn 9cc.
 
 ## print_node_tree's usage
 ```sh
-% ./print_node_tree 'a=1;b=1;return a+b;'
+% ./print_node_tree.sh 'a=1;b=1;return a+b;'
 ```
