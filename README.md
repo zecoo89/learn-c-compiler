@@ -34,7 +34,7 @@ This repository is to learn 9cc.
 % echo $?
 ```
 
-## Visualize
+## Visualization
 ### token
 ```sh
 % ./print_token.sh 'a=1;'
