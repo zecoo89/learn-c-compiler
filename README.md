@@ -10,6 +10,12 @@ This repository is to learn 9cc.
 % make test
 ```
 
+## MacOS support
+```sh
+% make clean
+% CFLAGS=-DMAC_FLAG make all
+```
+
 ## 9cc's usage
  compile to assembly code.
 ```sh

@@ -67,6 +67,8 @@ struct Node {
   // to represent blocks '{stmt*}'
   Node *stmt;
 
+  // to make function list
+  Node *next_func;
 };
 
 typedef struct LVar LVar;
@@ -80,7 +82,9 @@ struct LVar {
 
 void parse();
 Token *tokenize(char *);
+void gen_prologue();
 void gen(Node *);
+void gen_epilogue();
 
 void error(char *, ...);
 

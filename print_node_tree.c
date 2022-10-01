@@ -48,6 +48,8 @@ char *get_node_kind_string(Node *node){
       return "return";
     case ND_BLOCK:
       return "BLOCK";
+    case ND_CALL:
+      return node->name;
     default:
       return "";
   }
@@ -65,7 +67,9 @@ void print_node_tree(FILE *f, Node *node) {
 
 
   // parent node
-  if(node->kind == ND_IF) {
+  if (node->kind == ND_CALL) {
+      fprintf(f,"node_%d[label=\"%s()\"]\n", node_id, get_node_kind_string(node));
+  } else if(node->kind == ND_IF) {
     if(node->els) {
       fprintf(f,"node_%d[label=\"<if>%s|<cond>cond|<then>then|<else>else\",shape=\"record\"]\n", node_id, get_node_kind_string(node));
     } else {
