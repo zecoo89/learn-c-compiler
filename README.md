@@ -40,7 +40,7 @@ This repository is to learn 9cc.
 % ./print_token.sh 'a=1;'
 ```
 
-### node 
+### node
 ```sh
 % ./print_node_tree.sh 'a=1;b=1;return a+b;'
 ```
