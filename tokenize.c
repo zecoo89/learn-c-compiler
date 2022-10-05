@@ -7,6 +7,7 @@
 #include <stdarg.h>
 
 extern char *user_input;
+extern Token *token;
 
 void error_at(char *loc, char *fmt, ...) {
   va_list ap;
@@ -35,7 +36,8 @@ bool startswith(char *p, char *q) {
   return memcmp(p, q, strlen(q)) == 0;
 }
 
-Token *tokenize(char *p) {
+Token *tokenize() {
+  char *p = user_input;
   Token head;
   head.next = NULL;
   Token *cur = &head;
@@ -107,6 +109,8 @@ Token *tokenize(char *p) {
   }
 
   new_token(TK_EOF, cur, p, 0);
+
+  token = head.next;
   return head.next;
 }
 

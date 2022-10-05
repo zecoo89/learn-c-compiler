@@ -22,18 +22,11 @@ int main(int argc, char **argv) {
   }
 
   user_input = argv[1];
-  token = tokenize(user_input);
-
+  tokenize();
   parse();
 
   gen_prologue();
-
-  for (int i = 0; code[i]; i++) {
-    gen(code[i]);
-    printf("# end_line\n");
-    printf("  pop rax\n");
-  }
-
+  gen_codes(code);
   gen_epilogue();
   return 0;
 }
