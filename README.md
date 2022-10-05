@@ -34,12 +34,13 @@ This repository is to learn 9cc.
 % echo $?
 ```
 
-## print_token's usage
+## Visualization
+### token
 ```sh
 % ./print_token.sh 'a=1;'
 ```
 
-## print_node_tree's usage
+### node
 ```sh
-% ./print_node_tree 'a=1;b=1;return a+b;'
+% ./print_node_tree.sh 'a=1;b=1;return a+b;'
 ```
