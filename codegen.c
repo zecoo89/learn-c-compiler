@@ -89,9 +89,6 @@ void gen(Node *node) {
 #else
       printf("  call %s\n", node->name);
 #endif
-      for(int i=0;i<node->args_len;i++) {
-        printf("  pop rax\n");
-      }
       return;
     case ND_IF:
       gen(node->cond);
