@@ -10,6 +10,8 @@
 extern Node *func_head;
 extern Node *func_tail;
 
+char *registers[] = {"rdi", "rsi", "rdx", "rcx", "r8", "r9"};
+
 void gen_prologue() {
   // アセンブリの最初の部分を出力
   printf(".intel_syntax noprefix\n");
@@ -21,7 +23,11 @@ void gen_prologue() {
 #endif
   if (func_head) {
     while(func_head) {
+#ifdef MAC_FLAG
+      printf(", _%s", func_head->name);
+#else
       printf(", %s", func_head->name);
+#endif
       func_head = func_head->next_func;
     }
   }
@@ -75,10 +81,13 @@ void gen(Node *node) {
 
   switch (node->kind) {
     case ND_CALL:
-#ifdef OS_FLAG
-      printf("  call %s\n", node->name);
-#else
+      for(int i=node->args_len-1;i>=0;i--) {
+        printf("  mov %s, %d\n", registers[i], node->args[i]->val);
+      }
+#ifdef MAC_FLAG
       printf("  call _%s\n", node->name);
+#else
+      printf("  call %s\n", node->name);
 #endif
       return;
     case ND_IF:

@@ -302,8 +302,16 @@ Node* function_call(Token *t) {
     func_tail = node;
   }
 
-  //TODO 引数に対応する
+  if(consume(")")) {
+    return node;
+  }
 
+  int arg_num = 0;
+
+  do {
+    node->args[arg_num++] = expr();
+  } while(consume(","));
+  node->args_len = arg_num;
   expect(")");
 
   return node;
