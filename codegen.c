@@ -21,7 +21,11 @@ void gen_prologue() {
 #endif
   if (func_head) {
     while(func_head) {
+#ifdef MAC_FLAG
+      printf(", _%s", func_head->name);
+#else
       printf(", %s", func_head->name);
+#endif
       func_head = func_head->next_func;
     }
   }
@@ -74,12 +78,19 @@ void gen(Node *node) {
   Node *cur;
 
   switch (node->kind) {
+    int arg_num = 0;
     case ND_CALL:
-#ifdef OS_FLAG
-      printf("  call %s\n", node->name);
-#else
+      while(node->args[arg_num]) {
+        gen(node->args[arg_num++]);
+      }
+#ifdef MAC_FLAG
       printf("  call _%s\n", node->name);
+#else
+      printf("  call %s\n", node->name);
 #endif
+      for(int i=0;i<arg_num;i++) {
+        printf("  pop rax\n");
+      }
       return;
     case ND_IF:
       gen(node->cond);

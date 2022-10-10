@@ -69,6 +69,8 @@ struct Node {
 
   // to make function list
   Node *next_func;
+  // function call argument
+  Node *args[6];
 };
 
 typedef struct LVar LVar;
