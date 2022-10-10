@@ -48,6 +48,14 @@ void gen_epilogue() {
   printf("  ret\n");
 }
 
+void gen_codes(Node *code[]) {
+  for (int i = 0; code[i]; i++) {
+    gen(code[i]);
+    printf("# end_line\n");
+    printf("  pop rax\n");
+  }
+}
+
 void gen_lval(Node *node) {
   if (node->kind != ND_LVAR) {
     error("代入の左辺値が変数ではありません");

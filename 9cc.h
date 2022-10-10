@@ -81,9 +81,10 @@ struct LVar {
 };
 
 void parse();
-Token *tokenize(char *);
+Token *tokenize();
 void gen_prologue();
 void gen(Node *);
+void gen_codes(Node *[]);
 void gen_epilogue();
 
 void error(char *, ...);
