@@ -311,6 +311,7 @@ Node* function_call(Token *t) {
   do {
     node->args[arg_num++] = expr();
   } while(consume(","));
+  node->args_len = arg_num;
   expect(")");
 
   return node;
