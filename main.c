@@ -21,12 +21,11 @@ int main(int argc, char **argv) {
     return 1;
   }
 
-  user_input = argv[1];
+  user_input = read_file(argv[1]);
   tokenize();
   parse();
 
   gen_prologue();
   gen_codes(code);
-  gen_epilogue();
   return 0;
 }

@@ -39,7 +39,8 @@ typedef enum {
   ND_WHILE, // while
   ND_FOR, // for
   ND_BLOCK, //{  },
-  ND_CALL,
+  ND_CALL, // function call
+  ND_DEF, // function define
 } NodeKind;
 
 typedef struct Node Node;
@@ -68,7 +69,7 @@ struct Node {
   Node *stmt;
 
   // to make function list
-  Node *next_func;
+  Node *next_fn;
   // function call argument
   Node *args[6];
   int args_len;
@@ -83,6 +84,7 @@ struct LVar {
   int offset;
 };
 
+char *read_file(char *);
 void parse();
 Token *tokenize();
 void gen_prologue();

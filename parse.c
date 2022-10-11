@@ -9,8 +9,10 @@
 extern Token *token;
 extern LVar *locals;
 extern void error_at(char *, char *, ...);
-Node *func_head;
-Node *func_tail;
+Node *fn_head;
+Node *fn_tail;
+Node *fn_def_head;
+Node *fn_def_tail;
 
 Node *new_node();
 Node *new_node_num();
@@ -18,6 +20,7 @@ Node *new_node_num();
 bool at_eof();
 
 void program();
+Node *fn_def();
 Node *stmt();
 Node *expr();
 Node *assign();
@@ -132,10 +135,46 @@ void program() {
   int i = 0;
 
   while (!at_eof()) {
-    code[i++] = stmt();
+    code[i++] = fn_def();
   }
 
   code[i] = NULL;
+}
+
+Node *fn_def() {
+  Node *node;
+
+  Token *tok = consume_ident();
+  if (tok) {
+    node = new_node(ND_DEF, NULL, NULL);
+    node->name = dup(tok->str, tok->len);
+
+    if(fn_head) {
+      fn_tail->next_fn = node;
+      fn_tail = node;
+    } else {
+      fn_head = fn_tail = node;
+    }
+
+    expect("(");
+    //TODO suport arguments
+    expect(")");
+    expect("{");
+
+    Node *current = node;
+    while(!consume("}")) {
+      current->stmt = stmt();
+      current = current->stmt;
+    }
+
+
+    return node;
+  } else {
+    error_at(token->str, "関数定義ではありません");
+  }
+
+  //到達しないので意味はないが、コンパイラのwarningが出ないようにする
+  return node;
 }
 
 Node *stmt() {
@@ -293,14 +332,6 @@ Node *unary() {
 Node* function_call(Token *t) {
   Node *node = new_node(ND_CALL, NULL, NULL);
   node->name = dup(t->str, t->len);
-
-  if(func_head) {
-    func_tail->next_func = node;
-    func_tail = node;
-  }else {
-    func_head = node;
-    func_tail = node;
-  }
 
   if(consume(")")) {
     return node;

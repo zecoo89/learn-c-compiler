@@ -1,5 +1,6 @@
 #include "9cc.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 #ifdef MAC_FLAG
 #define MOVZXXX "movzx"
@@ -7,38 +8,39 @@
 #define MOVZXXX "movzb"
 #endif
 
-extern Node *func_head;
-extern Node *func_tail;
+extern Node *fn_head;
+extern Node *fn_tail;
 
 char *registers[] = {"rdi", "rsi", "rdx", "rcx", "r8", "r9"};
 
 void gen_prologue() {
   // アセンブリの最初の部分を出力
   printf(".intel_syntax noprefix\n");
+  printf(".globl");
 
+  Node *cur = fn_head;
+  if(cur) {
 #ifdef MAC_FLAG
-  printf(".globl _main");
+    printf(" _%s", cur->name);
 #else
-  printf(".globl main");
+    printf(" %s", cur->name);
 #endif
-  if (func_head) {
-    while(func_head) {
+    cur = cur->next_fn;
+  }
+  while(cur) {
 #ifdef MAC_FLAG
-      printf(", _%s", func_head->name);
+    printf(", _%s", cur->name);
 #else
-      printf(", %s", func_head->name);
+    printf(", %s", cur->name);
 #endif
-      func_head = func_head->next_func;
-    }
+    cur = cur->next_fn;
   }
   printf("\n");
 
-#ifdef MAC_FLAG
-  printf("_main:\n"); // for Mac support
-#else
-  printf("main:\n");
-#endif
 
+}
+
+void gen_fn_prologue() {
   //プロローグ
   //変数26個分の領域を確保する
   printf("# prologue\n");
@@ -47,7 +49,8 @@ void gen_prologue() {
   printf("  sub rsp, 208\n");
 }
 
-void gen_epilogue() {
+void gen_fn_epilogue() {
+  printf("  pop rax\n");
   printf("# epilogue\n");
   printf("  mov rsp, rbp\n");
   printf("  pop rbp\n");
@@ -57,8 +60,6 @@ void gen_epilogue() {
 void gen_codes(Node *code[]) {
   for (int i = 0; code[i]; i++) {
     gen(code[i]);
-    printf("# end_line\n");
-    printf("  pop rax\n");
   }
 }
 
@@ -80,6 +81,26 @@ void gen(Node *node) {
   Node *cur;
 
   switch (node->kind) {
+    case ND_DEF:
+#ifdef MAC_FLAG
+      printf("_%s:\n", node->name); // for Mac support
+#else
+      printf("%s:\n", node->name);
+#endif
+
+      gen_fn_prologue();
+
+      cur = node->stmt;
+      while(cur) {
+        gen(cur);
+        //1つ1つのステートメントは1つの値をスタックに残すので、
+        //その値を毎回ポップさせる。
+        cur = cur->stmt;
+      }
+
+      gen_fn_epilogue();
+      return;
+
     case ND_CALL:
       for(int i=node->args_len-1;i>=0;i--) {
         printf("  mov %s, %d\n", registers[i], node->args[i]->val);
