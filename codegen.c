@@ -95,6 +95,7 @@ void gen(Node *node) {
         gen(cur);
         //1つ1つのステートメントは1つの値をスタックに残すので、
         //その値を毎回ポップさせる。
+        //printf("  pop rax\n");
         cur = cur->stmt;
       }
 
@@ -110,6 +111,9 @@ void gen(Node *node) {
 #else
       printf("  call %s\n", node->name);
 #endif
+      // 呼び出した関数内のpop raxとcall後のpop raxが重複してしまうので、
+      // call後にpush raxを入れる
+      printf("  push rax\n");
       return;
     case ND_IF:
       gen(node->cond);
@@ -154,7 +158,7 @@ void gen(Node *node) {
         gen(cur);
         //1つ1つのステートメントは1つの値をスタックに残すので、
         //その値を毎回ポップさせる。
-        printf("  pop rax\n");
+        //printf("  pop rax\n");
         cur = cur->stmt;
       }
       return;

@@ -49,5 +49,6 @@ assert 1  ./test_assets/if_else.c
 assert 10 ./test_assets/while.c
 assert 20 ./test_assets/for.c
 assert 11 ./test_assets/block.c
+assert 10 ./test_assets/func_call.c
 
 echo OK
