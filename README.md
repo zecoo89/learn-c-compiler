@@ -19,7 +19,7 @@ This repository is to learn 9cc.
 ## 9cc's usage
  compile to assembly code.
 ```sh
-% ./9cc <filepath> > tmp.s
+% ./9cc filepath > tmp.s
 ```
  compile to binary.
 ```sh
