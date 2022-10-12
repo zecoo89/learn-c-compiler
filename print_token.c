@@ -81,8 +81,8 @@ int main(int argc, char **argv) {
     return 1;
   }
 
-  user_input = argv[1];
-  token = tokenize(user_input);
+  user_input = read_file(argv[1]);
+  token = tokenize();
 
   //print_tokens(stdout);
   print_token_graph(stdout);
