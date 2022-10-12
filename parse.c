@@ -158,7 +158,11 @@ Node *fn_def() {
 
     expect("(");
     //TODO suport arguments
-    expect(")");
+    int arg_num = 0;
+    while(!consume(")")) {
+      node->args[arg_num++] = //TODO lvar;
+      node->args_len = arg_num;
+    }
     expect("{");
 
     Node *current = node;
