@@ -40,15 +40,6 @@ void gen_prologue() {
 
 }
 
-void gen_fn_prologue() {
-  //プロローグ
-  //変数26個分の領域を確保する
-  printf("# prologue\n");
-  printf("  push rbp\n");
-  printf("  mov rbp, rsp\n");
-  printf("  sub rsp, 208\n");
-}
-
 void gen_fn_epilogue() {
   printf("  pop rax\n");
   printf("# epilogue\n");
@@ -88,7 +79,14 @@ void gen(Node *node) {
       printf("%s:\n", node->name);
 #endif
 
-      gen_fn_prologue();
+      printf("# prologue\n");
+      printf("  push rbp\n");
+      printf("  mov rbp, rsp\n");
+      printf("  sub rsp, 208\n");
+
+      for(int i=0;i<node->args_len;i++) {
+        printf("  mov [rbp-%d], %s\n", 8*(i+1),registers[i]);
+      }
 
       cur = node->stmt;
       while(cur) {
@@ -111,8 +109,8 @@ void gen(Node *node) {
 #else
       printf("  call %s\n", node->name);
 #endif
-      // 呼び出した関数内のpop raxとcall後のpop raxが重複してしまうので、
-      // call後にpush raxを入れる
+      // 呼び出した関数内部の最後のpop raxとcall後のpop raxが重複してしまうので、
+      // call後にpush raxを入れることで関数内部の最後のpop raxを打ち消す
       printf("  push rax\n");
       return;
     case ND_IF:

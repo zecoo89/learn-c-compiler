@@ -157,11 +157,39 @@ Node *fn_def() {
     }
 
     expect("(");
-    //TODO suport arguments
-    int arg_num = 0;
-    while(!consume(")")) {
-      node->args[arg_num++] = //TODO lvar;
-      node->args_len = arg_num;
+    if (!consume(")")) {
+      int arg_num = 0;
+      do {
+        tok = consume_ident();
+        if (tok) {
+          Node *nod = new_node(ND_LVAR, NULL, NULL);
+          node->args[arg_num++] = nod;
+          node->args_len = arg_num;
+
+          LVar *lvar = find_lvar(tok);
+
+          if (lvar) {
+            //既存の変数なので、スタックのoffsetをノードに保存する
+            nod->offset = lvar->offset;
+          } else {
+            lvar = calloc(1, sizeof(LVar));
+            lvar->next = locals;
+            lvar->name = tok->str;
+            lvar->len = tok->len;
+            if(locals) {
+              //fprintf(stderr,"%s, %d\n", tok->str,locals->offset);
+              lvar->offset = locals->offset + 8;
+            } else {
+              lvar->offset = 8;
+            }
+            nod->offset = lvar->offset;
+          }
+
+          locals = lvar;
+        } else {
+          error_at(dup(token->str, token->len), "TK_IDENT以外のトークンです");
+        }
+      } while(!consume(")") && consume(","));
     }
     expect("{");
 
@@ -171,10 +199,9 @@ Node *fn_def() {
       current = current->stmt;
     }
 
-
     return node;
   } else {
-    error_at(token->str, "関数定義ではありません");
+    error_at(dup(token->str, token->len), "関数定義ではありません");
   }
 
   //到達しないので意味はないが、コンパイラのwarningが出ないようにする
@@ -366,8 +393,7 @@ Node *primary() {
     if(consume("(")) {
       return function_call(tok);
     }
-    Node *node = calloc(1, sizeof(Node));
-    node->kind = ND_LVAR;
+    Node *node = new_node(ND_LVAR, NULL, NULL);
     node->name = dup(tok->str, tok->len);
 
     LVar *lvar = find_lvar(tok);

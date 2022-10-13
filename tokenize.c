@@ -75,7 +75,7 @@ Token *tokenize() {
       cur = new_token(TK_IDENT, cur, p, 0);
       char *q = p;
 
-      while ('a' <= *p && *p <= 'z') {
+      while (('a' <= *p && *p <= 'z') || *p == '_') {
         p++;
       }
 

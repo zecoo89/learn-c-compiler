@@ -1,7 +1,7 @@
 main() {
-  add(1, 2);
+  return add(1, 2);
 }
 
-getnum(x, y) {
+add(x, y) {
   return x + y;
 }

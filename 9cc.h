@@ -70,9 +70,13 @@ struct Node {
 
   // to make function list
   Node *next_fn;
-  // function call argument
+
+  // To ND_CALL and ND_DEF
   Node *args[6];
   int args_len;
+
+  // To ND_DEF
+  //LVar locals;
 };
 
 typedef struct LVar LVar;
