@@ -1,13 +1,10 @@
 factorial(n) {
-  ans = 1;
-
-  for(i=1;i<=n;i=i+1) {
-    ans = ans * i;
+  if(n == 1) {
+    return 1;
   }
-
-  return ans;
+  return n * factorial(n-1);
 }
 
 main() {
-  return factorial(4);
+  return factorial(5);
 }

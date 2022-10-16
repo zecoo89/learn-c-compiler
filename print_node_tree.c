@@ -126,9 +126,8 @@ int main(int argc, char **argv) {
     return 1;
   }
 
-  user_input = argv[1];
-  token = tokenize(user_input);
-
+  user_input = read_file(argv[1]);
+  tokenize();
   parse();
   print_node_tree_init(stdout);
   for(int i=0;code[i];i++) {

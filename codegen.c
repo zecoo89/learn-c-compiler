@@ -59,6 +59,7 @@ void gen_lval(Node *node) {
     error("代入の左辺値が変数ではありません");
   }
 
+  printf("# var %s\n", node->name);
   printf("# push variable address\n");
   printf("  mov rax, rbp\n");
   printf("  sub rax, %d\n", node->offset);
@@ -102,7 +103,12 @@ void gen(Node *node) {
 
     case ND_CALL:
       for(int i=node->args_len-1;i>=0;i--) {
-        printf("  mov %s, %d\n", registers[i], node->args[i]->val);
+        //TODO 現状だと数値以外だと0を引数に渡すことになるので、
+        //変数や演算に対応する。
+        gen(node->args[i]);
+        printf("  pop rax\n");
+        printf("  mov %s, rax\n", registers[i]);
+        //printf("  mov %s, %d\n", registers[i], node->args[i]->val);
       }
 #ifdef MAC_FLAG
       printf("  call _%s\n", node->name);
@@ -174,7 +180,6 @@ void gen(Node *node) {
       return;
     case ND_LVAR:
       gen_lval(node);
-      printf("# push variable data\n");
       printf("  pop rax\n");
       printf("  mov rax, [rax]\n");
       printf("  push rax\n");

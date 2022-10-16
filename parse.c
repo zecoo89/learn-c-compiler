@@ -183,9 +183,8 @@ Node *fn_def() {
               lvar->offset = 8;
             }
             nod->offset = lvar->offset;
+            locals = lvar;
           }
-
-          locals = lvar;
         } else {
           error_at(dup(token->str, token->len), "TK_IDENT以外のトークンです");
         }
@@ -399,6 +398,7 @@ Node *primary() {
     LVar *lvar = find_lvar(tok);
 
     if (lvar) {
+      //fprintf(stderr, "name:%s, offset:%d\n", dup(lvar->name, lvar->len), lvar->offset);
       //既存の変数なので、スタックのoffsetをノードに保存する
       node->offset = lvar->offset;
     } else {
@@ -409,13 +409,15 @@ Node *primary() {
       if(locals) {
         //fprintf(stderr,"%s, %d\n", tok->str,locals->offset);
         lvar->offset = locals->offset + 8;
+        //fprintf(stderr, "[locals] name:%s, offset:%d\n", dup(lvar->name, lvar->len), lvar->offset);
       } else {
         lvar->offset = 8;
+        //fprintf(stderr, "[ null ] name:%s, offset:%d\n", dup(lvar->name, lvar->len), lvar->offset);
       }
       node->offset = lvar->offset;
+      locals = lvar;
     }
 
-    locals = lvar;
 
     return node;
   }
