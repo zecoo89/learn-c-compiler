@@ -160,9 +160,6 @@ void gen(Node *node) {
       cur = node->stmt;
       while(cur) {
         gen(cur);
-        //1つ1つのステートメントは1つの値をスタックに残すので、
-        //その値を毎回ポップさせる。
-        //printf("  pop rax\n");
         cur = cur->stmt;
       }
       return;
