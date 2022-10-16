@@ -355,6 +355,14 @@ Node *unary() {
     return new_node(ND_SUB, new_node_num(0), primary());
   }
 
+  if(consume("*")) {
+    return unary();
+  }
+
+  if(consume("&")) {
+    return unary();
+  }
+
   return primary();
 }
 
