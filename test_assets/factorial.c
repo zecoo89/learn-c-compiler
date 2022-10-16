@@ -6,5 +6,5 @@ factorial(n) {
 }
 
 main() {
-  return factorial(5);
+  return factorial(4);
 }

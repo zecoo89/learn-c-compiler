@@ -8,5 +8,5 @@ fibo(n){
 }
 
 main() {
-  return fibo(5);
+  return fibo(10);
 }

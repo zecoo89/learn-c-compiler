@@ -52,6 +52,7 @@ assert 11 ./test_assets/block.c
 assert 10 ./test_assets/func_def_call.c
 assert 10 ./test_assets/func_def_call_return.c
 assert 3  ./test_assets/func_def_call_with_arguments.c
-assert 24  ./test_assets/factorial.c
+assert 24 ./test_assets/factorial.c
+assert 55 ./test_assets/fibonacci.c
 
 echo OK
