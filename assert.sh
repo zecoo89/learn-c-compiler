@@ -11,7 +11,6 @@ actual="$?"
 if [ "$actual" = "$expected" ]; then
   echo "[ok] expect: `printf "%2d" $expected`, actual: `printf "%2d" $actual` ($input)"
 else
-  echo [error] $input
-  echo "$expected expected, but got $actual"
+  echo [error] "expect: `printf "%2d" $expected`, actual: `printf "%2d" $actual` ($input)"
   exit 1
 fi
