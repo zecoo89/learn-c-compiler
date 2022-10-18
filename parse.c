@@ -98,7 +98,7 @@ Token *consume_ident() {
 
 Token *consume_type(char *op) {
   Token *tok = consume_ident();
-  if(!tok && memcmp(tok->str, op, token->len))
+  if(!tok && memcmp(tok->str, op, tok->len))
     return NULL;
 
   return tok;
@@ -106,7 +106,7 @@ Token *consume_type(char *op) {
 
 void expect_type(char *op) {
   Token *tok = consume_ident();
-  if(!tok || memcmp(tok->str, op, token->len))
+  if(!tok || memcmp(tok->str, op, tok->len))
     error("expect: '%s', actual: '%s'", "int", dup(tok->str, tok->len));
 
 }
