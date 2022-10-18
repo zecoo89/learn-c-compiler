@@ -104,7 +104,7 @@ void expect(char *op) {
   if (token->kind != TK_RESERVED ||
       strlen(op) != token->len ||
       memcmp(token->str, op, token->len)) {
-    error("expect: '%s'\nactual: '%s'", op, dup(token->str, token->len));
+    error("expect: '%s', actual: '%s'", op, dup(token->str, token->len));
   }
 
   token = token->next;
