@@ -37,10 +37,10 @@ This repository is to learn 9cc.
 ## Visualization
 ### token
 ```sh
-% ./print_token.sh 'a=1;'
+% ./print_token.sh filepath
 ```
 
 ### node
 ```sh
-% ./print_node_tree.sh 'a=1;b=1;return a+b;'
+% ./print_node_tree.sh filepath
 ```
