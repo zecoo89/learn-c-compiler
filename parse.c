@@ -96,9 +96,9 @@ Token *consume_ident() {
   return NULL;
 }
 
-Token *consume_type() {
+Token *consume_type(char *op) {
   Token *tok = consume_ident();
-  if(!tok && memcmp(tok->str, "int", token->len))
+  if(!tok && memcmp(tok->str, op, token->len))
     return NULL;
 
   return tok;
