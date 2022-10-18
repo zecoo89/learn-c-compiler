@@ -96,6 +96,20 @@ Token *consume_ident() {
   return NULL;
 }
 
+Token *consume_type() {
+  Token *tok = consume_ident();
+  if(!tok && !memcmp(tok->str, "int", token->len))
+    return NULL;
+
+  return tok;
+}
+
+void expect_type(char *op) {
+  Token *tok = consume_ident();
+  if(!tok || !memcmp(tok->str, op, token->len))
+    error("expect: '%s', actual: '%s'", "int", dup(tok->str, tok->len));
+}
+
 void expect(char *op) {
   //fprintf(stderr, "token->kind = %d\n", token->kind);
   //fprintf(stderr, "token->len = %d\n", token->len);
@@ -144,7 +158,7 @@ void program() {
 Node *fn_def() {
   Node *node;
 
-  expect("int");
+  expect_type("int");
 
   Token *tok = consume_ident();
   if (tok) {
@@ -162,6 +176,7 @@ Node *fn_def() {
     if (!consume(")")) {
       int arg_num = 0;
       do {
+        expect_type("int")
         tok = consume_ident();
         if (tok) {
           Node *nod = new_node(ND_LVAR, NULL, NULL);
