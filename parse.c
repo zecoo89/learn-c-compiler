@@ -176,7 +176,7 @@ Node *fn_def() {
     if (!consume(")")) {
       int arg_num = 0;
       do {
-        expect_type("int")
+        expect_type("int");
         tok = consume_ident();
         if (tok) {
           Node *nod = new_node(ND_LVAR, NULL, NULL);
