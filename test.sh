@@ -36,3 +36,4 @@
 ./assert.sh 3  ./test_assets/func_def_call_with_arguments.c
 ./assert.sh 24 ./test_assets/factorial.c
 ./assert.sh 55 ./test_assets/fibonacci.c
+./assert.sh 3 ./test_assets/address.c
