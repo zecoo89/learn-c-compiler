@@ -117,7 +117,7 @@ int expect_number() {
     fprintf(stderr, "token->kind = %d\n", token->kind);
     fprintf(stderr, "token->len = %d\n", token->len);
     fprintf(stderr, "token->str = '%s'\n", token->str);
-    error_at(token->str, "数ではありません");
+    error_at(dup(token->str, token->len), "数ではありません");
   }
 
   int val = token->val;
@@ -143,6 +143,8 @@ void program() {
 
 Node *fn_def() {
   Node *node;
+
+  expect("int");
 
   Token *tok = consume_ident();
   if (tok) {
