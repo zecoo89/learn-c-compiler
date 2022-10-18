@@ -1,5 +1,5 @@
-main() {
+int main() {
   {
-    a = 11;
+    int a = 11;
   }
 }

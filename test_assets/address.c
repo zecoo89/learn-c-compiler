@@ -1,5 +1,5 @@
-main() {
-  x = 3;
-  y = &x;
+int main() {
+  int x = 3;
+  int y = &x;
   return *y;
 }

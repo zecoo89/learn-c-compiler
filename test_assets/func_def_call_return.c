@@ -1,7 +1,7 @@
-main() {
+int main() {
   getnum();
 }
 
-getnum() {
+int getnum() {
   return 10;
 }

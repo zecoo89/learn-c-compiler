@@ -1,6 +1,6 @@
-main() {
-  a = 1;
-  b = 4;
+int main() {
+  int a = 1;
+  int b = 4;
 
   if(a == 2)
     return b;
