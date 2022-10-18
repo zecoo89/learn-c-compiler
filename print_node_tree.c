@@ -50,6 +50,8 @@ char *get_node_kind_string(Node *node){
       return "BLOCK";
     case ND_CALL:
       return node->name;
+    case ND_DEF:
+      return node->name;
     default:
       return "";
   }
@@ -58,6 +60,14 @@ char *get_node_kind_string(Node *node){
 void print_node_tree(FILE *f, Node *node) {
   int node_id = max_node_id;
 
+  if(node->kind == ND_DEF) {
+    fprintf(f,"node_%d[label=\"define %s(args_len=%d)\"]\n", node_id, get_node_kind_string(node), node->args_len);
+    max_node_id++;
+    fprintf(f,"node_%d -> node_%d[style=\"dashed\"]\n", node_id, max_node_id);
+    node_id = max_node_id;
+    node = node->stmt;
+  }
+
   if(node->stmt) {
     fprintf(f,"node_%d[label=\"%s\"]\n", node_id, get_node_kind_string(node));
     max_node_id++;
@@ -65,10 +75,21 @@ void print_node_tree(FILE *f, Node *node) {
     print_node_tree(f, node->stmt);
   }
 
-
   // parent node
   if (node->kind == ND_CALL) {
-      fprintf(f,"node_%d[label=\"%s()\"]\n", node_id, get_node_kind_string(node));
+    fprintf(f,"node_%d[label=\"call %s|{", node_id, get_node_kind_string(node));
+    for(int i=0;i<node->args_len;i++) {
+      fprintf(f, "<arg%d>arg:%d", i, i);
+    }
+    fprintf(f, "}\", shape=\"record\"]\n");
+    max_node_id++;
+    if(node->args_len > 0) {
+      for(int i=0;i<node->args_len;i++) {
+        fprintf(f, "node_%d:arg%d -> node_%d\n", node_id, i, max_node_id);
+        print_node_tree(f, node->args[i]);
+        max_node_id++;
+      }
+    }
   } else if(node->kind == ND_IF) {
     if(node->els) {
       fprintf(f,"node_%d[label=\"<if>%s|<cond>cond|<then>then|<else>else\",shape=\"record\"]\n", node_id, get_node_kind_string(node));
