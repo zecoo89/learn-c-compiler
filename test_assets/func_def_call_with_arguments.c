@@ -1,7 +1,7 @@
-main() {
+int main() {
   return add(1, 2);
 }
 
-add(x, y) {
+int add(int x, int y) {
   return x + y;
 }
