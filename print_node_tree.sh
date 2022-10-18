@@ -3,7 +3,7 @@
 ./print_node_tree "$1" > node_tree.dot
 
 if [ $? == 0 ]; then
-  echo 'print_token successed.'
+  echo 'print_node_tree successed.'
   dot -Tpng node_tree.dot -o node_tree.png
 else
   echo 'print_node_tree failed.'
