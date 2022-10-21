@@ -18,6 +18,9 @@ struct Token {
   int val;
   char *str;
   int len;
+
+  int line_number;
+  int from_head;
 };
 
 // 抽象構文木のノード種類
@@ -45,6 +48,18 @@ typedef enum {
   ND_DEREF // *
 } NodeKind;
 
+typedef enum {
+  INT,
+  PTR
+} TypeKind;
+typedef struct Type Type;
+
+struct Type {
+  TypeKind kind;
+  Type *ptr_to;
+};
+
+
 typedef struct Node Node;
 
 // 抽象構文木のノードの型
@@ -54,6 +69,8 @@ struct Node {
   Node * rhs;
   int val;
   int offset;
+
+  Type *type;
 
   //if(cond) then else els;
   // while(cond) body

@@ -42,6 +42,17 @@ char * dup(char *str, int len) {
   return buf;
 }
 
+Type *new_type(TypeKind kind, Type *ty) {
+  Type *new_ty = calloc(1, sizeof(Type));
+  new_ty->kind = kind;
+
+  if(ty) {
+    new_ty->ptr_to = ty;
+  }
+
+  return ty;
+}
+
 Node *new_node(NodeKind kind, Node *lhs, Node *rhs) {
   Node *node = calloc(1, sizeof(Node));
   node->kind = kind;
@@ -130,10 +141,10 @@ void expect(char *op) {
 // それ以外の場合にはエラーを報告する。
 int expect_number() {
   if (token->kind != TK_NUM) {
-    fprintf(stderr, "token->kind = %d\n", token->kind);
-    fprintf(stderr, "token->len = %d\n", token->len);
-    fprintf(stderr, "token->str = '%s'\n", token->str);
-    error_at(dup(token->str, token->len), "数ではありません");
+    //fprintf(stderr, "token->kind = %d\n", token->kind);
+    //fprintf(stderr, "token->len = %d\n", token->len);
+    //fprintf(stderr, "token->str = '%s'\n", token->str);
+    error_at(token->str, "数ではありません");
   }
 
   int val = token->val;
@@ -377,10 +388,16 @@ Node *unary() {
   }
 
   if(consume("*")) {
+    Node *unode = unary();
+    unode->type = new_type(PTR, unode->type);
+
     return unary();
   }
 
   if(consume("&")) {
+    Node *unode = unary();
+    unode->type = new_type(PTR, unode->type);
+
     return unary();
   }
 
