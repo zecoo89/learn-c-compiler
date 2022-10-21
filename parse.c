@@ -391,14 +391,14 @@ Node *unary() {
     Node *unode = unary();
     unode->type = new_type(PTR, unode->type);
 
-    return unary();
+    return unode;
   }
 
   if(consume("&")) {
     Node *unode = unary();
     unode->type = new_type(PTR, unode->type);
 
-    return unary();
+    return unode;
   }
 
   return primary();
