@@ -392,11 +392,7 @@ Node *unary() {
     unode->type = new_type(PTR, unode->type);
     Node *node = new_node(ND_DEREF, unode, NULL);
 
-<<<<<<< Updated upstream
-    return unode;
-=======
     return node;
->>>>>>> Stashed changes
   }
 
   if(consume("&")) {
@@ -404,11 +400,7 @@ Node *unary() {
     unode->type = new_type(PTR, unode->type);
     Node *node = new_node(ND_ADDR, unode, NULL);
 
-<<<<<<< Updated upstream
-    return unode;
-=======
     return node;
->>>>>>> Stashed changes
   }
 
   return primary();
