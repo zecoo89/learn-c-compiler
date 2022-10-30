@@ -107,7 +107,7 @@ Token *tokenize() {
       cur = new_token(TK_IDENT, cur, p, 0);
       char *q = p;
 
-      while (('a' <= *p && *p <= 'z') || *p == '_') {
+      while (('a' <= *p && *p <= 'z') || *p == '_' || isdigit(*p)) {
         p++;
         from_head++;
       }
