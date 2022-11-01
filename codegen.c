@@ -55,16 +55,29 @@ void gen_codes(Node *code[]) {
 }
 
 void gen_lval(Node *node) {
-  if (node->kind != ND_LVAR) {
-    error("代入の左辺値が変数ではありません: %d", node->kind);
+  Node *nod = node;
+
+  if (node->kind == ND_DEREF) {
+    nod = node->lhs;
   }
 
-  printf("# var %s\n", node->name);
+  if (nod->kind != ND_LVAR) {
+    error("代入の左辺値が変数ではありません: %d", nod->kind);
+  }
+
+  printf("# var %s\n", nod->name);
   printf("# push variable address\n");
   printf("  mov rax, rbp\n");
-  printf("  sub rax, %d\n", node->offset);
-
+  printf("  sub rax, %d\n", nod->offset);
   printf("  push rax\n");
+
+  /*
+  if (node->kind == ND_DEREF) {
+    printf("  pop rax\n");
+    printf("  mov rax, [rax]\n");
+    printf("  push rax\n");
+  }
+  */
 }
 
 int label_number = 0;
@@ -165,7 +178,14 @@ void gen(Node *node) {
       }
       return;
     case ND_RETURN:
-      gen(node->lhs);
+      if(node->lhs->kind == ND_DEREF) {
+        gen(node->lhs);
+        printf("  pop rax\n");
+        printf("  mov rax, [rax]\n");
+        printf("  push rax\n");
+      } else {
+        gen(node->lhs);
+      }
       printf("# RETURN\n");
       printf("  pop rax\n");
       printf("  mov rsp, rbp\n");
@@ -177,10 +197,12 @@ void gen(Node *node) {
       printf("  push %d\n", node->val);
       return;
     case ND_ADDR:
+      printf("# ADDR\n");
       gen_lval(node->lhs);
       return;
     case ND_DEREF:
-      gen(node->lhs);
+      printf("# DEREF\n");
+      gen_lval(node->lhs);
       printf("  pop rax\n");
       printf("  mov rax, [rax]\n");
       printf("  push rax\n");
@@ -193,10 +215,7 @@ void gen(Node *node) {
       return;
     case ND_ASSIGN:
       if(node->lhs->kind == ND_DEREF) {
-        gen_lval(node->lhs->lhs);
-        printf("  pop rax\n");
-        printf("  mov rax, [rax]\n");
-        printf("  push rax\n");
+        gen(node->lhs);
       } else {
         gen_lval(node->lhs);
       }
@@ -212,7 +231,6 @@ void gen(Node *node) {
       break;
   }
 
-
   gen(node->lhs);
   gen(node->rhs);
 
@@ -221,6 +239,22 @@ void gen(Node *node) {
 
   switch (node->kind) {
     case ND_ADD:
+      if(node->lhs->kind == ND_LVAR) {
+        LVar *lvar = find_lvar_by_node(node->lhs);
+
+        //lvar->typeのチェックは型の実装完了後には必要ない
+        if(lvar && lvar->type && lvar->type->kind == PTR) {
+          if(lvar->type->ptr_to->kind == INT) {
+            for(int i=1;i<3;i++) {
+              printf("  add rdi, rdi\n");
+            }
+          } else {
+            for(int i=1;i<4;i++) {
+              printf("  add rdi, rdi\n");
+            }
+          }
+        }
+      }
       printf("# ADD\n");
       printf("  add rax, rdi\n");
       break;

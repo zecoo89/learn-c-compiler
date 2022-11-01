@@ -105,6 +105,7 @@ struct LVar {
   char *name;
   int len;
   int offset;
+  Type *type;
 };
 
 char *read_file(char *);
@@ -116,4 +117,6 @@ void gen_codes(Node *[]);
 void gen_epilogue();
 
 void error(char *, ...);
+
+LVar * find_lvar_by_node(Node *);
 

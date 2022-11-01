@@ -2,9 +2,10 @@
 
 expected="$1"
 input="$2"
+extension="$3"
 
 ./9cc "$input" > tmp.s
-cc -o tmp tmp.s
+cc -o tmp tmp.s $extension
 ./tmp
 actual="$?"
 

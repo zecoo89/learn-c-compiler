@@ -32,6 +32,7 @@ Node *unary();
 Node *primary();
 
 LVar *find_lvar(Token *);
+LVar *find_lvar_by_node(Node *);
 
 // alternative of strndup
 char * dup(char *str, int len) {
@@ -46,11 +47,17 @@ Type *new_type(TypeKind kind, Type *ty) {
   Type *new_ty = calloc(1, sizeof(Type));
   new_ty->kind = kind;
 
-  if(ty) {
-    new_ty->ptr_to = ty;
+  Type *cur = ty;
+  while(cur && cur->ptr_to) {
+    cur = cur->ptr_to;
   }
 
-  return new_ty;
+  if(cur) {
+    cur->ptr_to = new_ty;
+    return ty;
+  } else {
+    return new_ty;
+  }
 }
 
 Node *new_node(NodeKind kind, Node *lhs, Node *rhs) {
@@ -124,10 +131,6 @@ void expect_type(char *op) {
 }
 
 void expect(char *op) {
-  //fprintf(stderr, "token->kind = %d\n", token->kind);
-  //fprintf(stderr, "token->len = %d\n", token->len);
-  //fprintf(stderr, "token->str = '%s'\n", token->str);
-  //fprintf(stderr, "strlen(op) = %ld\n", strlen(op));
   if (token->kind != TK_RESERVED ||
       strlen(op) != token->len ||
       memcmp(token->str, op, token->len)) {
@@ -141,9 +144,6 @@ void expect(char *op) {
 // それ以外の場合にはエラーを報告する。
 int expect_number() {
   if (token->kind != TK_NUM) {
-    //fprintf(stderr, "token->kind = %d\n", token->kind);
-    //fprintf(stderr, "token->len = %d\n", token->len);
-    //fprintf(stderr, "token->str = '%s'\n", token->str);
     error_at(token->str, "数ではありません");
   }
 
@@ -288,6 +288,15 @@ Node *stmt() {
     return node;
   } else if(consume_type("int")) {
     node = expr();
+    Node *nod = node;
+    if(node->kind == ND_ASSIGN) {
+      nod = node->lhs;
+    }
+
+    nod->type = new_type(INT, nod->type);
+    //変数に型をつける
+    LVar *lvar = find_lvar_by_node(nod);
+    lvar->type = nod->type;
   } else {
     node = expr();
   }
@@ -389,15 +398,14 @@ Node *unary() {
 
   if(consume("*")) {
     Node *unode = unary();
-    unode->type = new_type(PTR, unode->type);
     Node *node = new_node(ND_DEREF, unode, NULL);
+    node->type = new_type(PTR, unode->type);
 
     return node;
   }
 
   if(consume("&")) {
     Node *unode = unary();
-    unode->type = new_type(PTR, unode->type);
     Node *node = new_node(ND_ADDR, unode, NULL);
 
     return node;
@@ -446,21 +454,18 @@ Node *primary() {
     LVar *lvar = find_lvar(tok);
 
     if (lvar) {
-      //fprintf(stderr, "name:%s, offset:%d\n", dup(lvar->name, lvar->len), lvar->offset);
       //既存の変数なので、スタックのoffsetをノードに保存する
       node->offset = lvar->offset;
+      node->type = lvar->type;
     } else {
       lvar = calloc(1, sizeof(LVar));
       lvar->next = locals;
       lvar->name = tok->str;
       lvar->len = tok->len;
       if(locals) {
-        //fprintf(stderr,"%s, %d\n", tok->str,locals->offset);
         lvar->offset = locals->offset + 8;
-        //fprintf(stderr, "[locals] name:%s, offset:%d\n", dup(lvar->name, lvar->len), lvar->offset);
       } else {
         lvar->offset = 8;
-        //fprintf(stderr, "[ null ] name:%s, offset:%d\n", dup(lvar->name, lvar->len), lvar->offset);
       }
       node->offset = lvar->offset;
       locals = lvar;
@@ -488,3 +493,16 @@ LVar *find_lvar(Token *tok) {
   return NULL;
 }
 
+LVar *find_lvar_by_node(Node *node) {
+  while (node->kind == ND_DEREF) {
+    node = node->lhs;
+  }
+
+  for (LVar *var = locals; var; var = var->next) {
+    if (!memcmp(node->name, var->name, var->len)) {
+      return var;
+    }
+  }
+
+  return NULL;
+}
