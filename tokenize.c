@@ -127,6 +127,8 @@ Token *tokenize() {
         cur->kind = TK_WHILE;
       } else if(cur->len == 3 && memcmp("for", q, 3) == 0) {
         cur->kind = TK_FOR;
+      } else if(cur->len == 6 && memcmp("sizeof", q, 6) == 0) {
+        cur->kind = TK_SIZEOF;
       }
 
       continue;

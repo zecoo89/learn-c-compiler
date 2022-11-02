@@ -388,6 +388,10 @@ Node *mul() {
 }
 
 Node *unary() {
+  if(consume("sizeof")) {
+    Node *node = unary();
+  }
+
   if(consume("+")) {
     return primary();
   }
