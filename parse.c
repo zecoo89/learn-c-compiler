@@ -31,6 +31,7 @@ Node *mul();
 Node *unary();
 Node *primary();
 
+void new_lvar(Token *);
 LVar *find_lvar(Token *);
 LVar *find_lvar_by_node(Node *);
 
@@ -462,19 +463,8 @@ Node *primary() {
       node->offset = lvar->offset;
       node->type = lvar->type;
     } else {
-      lvar = calloc(1, sizeof(LVar));
-      lvar->next = locals;
-      lvar->name = tok->str;
-      lvar->len = tok->len;
-      if(locals) {
-        lvar->offset = locals->offset + 8;
-      } else {
-        lvar->offset = 8;
-      }
-      node->offset = lvar->offset;
-      locals = lvar;
+      new_lvar(tok);
     }
-
 
     return node;
   }
@@ -484,6 +474,22 @@ Node *primary() {
 
 bool at_eof() {
   return token->kind == TK_EOF;
+}
+
+void new_lvar(Token *tok) {
+  lvar = calloc(1, sizeof(LVar));
+  lvar->next = locals;
+  lvar->name = tok->str;
+  lvar->len = tok->len;
+
+  if(locals) {
+    lvar->offset = locals->offset + 8;
+  } else {
+    lvar->offset = 8;
+  }
+
+  node->offset = lvar->offset;
+  locals = lvar;
 }
 
 /* find left variable */
