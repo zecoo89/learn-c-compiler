@@ -35,6 +35,8 @@ void new_lvar(Token *, Node *);
 LVar *find_lvar(Token *);
 LVar *find_lvar_by_node(Node *);
 
+int get_type_size(TypeKind);
+
 // alternative of strndup
 char * dup(char *str, int len) {
   char *buf = malloc(len + 1);
@@ -378,9 +380,12 @@ Node *mul() {
 }
 
 Node *unary() {
-  if(consume("sizeof")) {
+  if(token->kind == TK_SIZEOF) {
+    token = token->next;
     Node *node = unary();
-    return node;
+
+    int type_size = get_type_size(node->type->kind);
+    return new_node_num(type_size);
   }
 
   if(consume("+")) {
@@ -464,6 +469,17 @@ Node *primary() {
 
 bool at_eof() {
   return token->kind == TK_EOF;
+}
+
+int get_type_size(TypeKind kind) {
+  switch(kind) {
+    case INT:
+      return 4;
+    case PTR:
+      return 8;
+    default:
+      error("対応していない型です: %d\n", kind);
+  }
 }
 
 void new_lvar(Token *tok, Node *node) {
