@@ -31,7 +31,7 @@ Node *mul();
 Node *unary();
 Node *primary();
 
-void new_lvar(Token *);
+void new_lvar(Token *, Node *);
 LVar *find_lvar(Token *);
 LVar *find_lvar_by_node(Node *);
 
@@ -203,18 +203,7 @@ Node *fn_def() {
             //既存の変数なので、スタックのoffsetをノードに保存する
             nod->offset = lvar->offset;
           } else {
-            lvar = calloc(1, sizeof(LVar));
-            lvar->next = locals;
-            lvar->name = tok->str;
-            lvar->len = tok->len;
-            if(locals) {
-              //fprintf(stderr,"%s, %d\n", tok->str,locals->offset);
-              lvar->offset = locals->offset + 8;
-            } else {
-              lvar->offset = 8;
-            }
-            nod->offset = lvar->offset;
-            locals = lvar;
+            new_lvar(tok, nod);
           }
         } else {
           error_at(dup(token->str, token->len), "TK_IDENT以外のトークンです");
@@ -463,7 +452,7 @@ Node *primary() {
       node->offset = lvar->offset;
       node->type = lvar->type;
     } else {
-      new_lvar(tok);
+      new_lvar(tok, node);
     }
 
     return node;
@@ -476,8 +465,8 @@ bool at_eof() {
   return token->kind == TK_EOF;
 }
 
-void new_lvar(Token *tok) {
-  lvar = calloc(1, sizeof(LVar));
+void new_lvar(Token *tok, Node *node) {
+  LVar *lvar = calloc(1, sizeof(LVar));
   lvar->next = locals;
   lvar->name = tok->str;
   lvar->len = tok->len;
