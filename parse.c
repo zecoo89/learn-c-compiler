@@ -380,6 +380,7 @@ Node *mul() {
 Node *unary() {
   if(consume("sizeof")) {
     Node *node = unary();
+    return node;
   }
 
   if(consume("+")) {

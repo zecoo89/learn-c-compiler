@@ -38,3 +38,4 @@
 ./assert.sh 55 ./test_assets/fibonacci.c
 ./assert.sh 3 ./test_assets/address.c
 ./assert.sh 8 ./test_assets/pointer_plus.c ./alloc4.c
+./assert.sh 4 ./test_assets/sizeof.c
