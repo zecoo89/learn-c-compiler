@@ -35,7 +35,7 @@ void new_lvar(Token *, Node *);
 LVar *find_lvar(Token *);
 LVar *find_lvar_by_node(Node *);
 
-int get_type_size(TypeKind);
+int get_type_size(Node *);
 
 // alternative of strndup
 char * dup(char *str, int len) {
@@ -384,7 +384,7 @@ Node *unary() {
     token = token->next;
     Node *node = unary();
 
-    int type_size = get_type_size(node->type->kind);
+    int type_size = get_type_size(node);
     return new_node_num(type_size);
   }
 
@@ -471,7 +471,16 @@ bool at_eof() {
   return token->kind == TK_EOF;
 }
 
-int get_type_size(TypeKind kind) {
+int get_type_size(Node *nod) {
+  Type *type = nod->type;
+
+  while(nod->kind == ND_DEREF) {
+    nod = nod->lhs;
+    type = type->ptr_to;
+  }
+
+  TypeKind kind = type->kind;
+
   switch(kind) {
     case INT:
       return 4;

@@ -40,3 +40,4 @@
 ./assert.sh 8 ./test_assets/pointer_plus.c ./alloc4.c
 ./assert.sh 4 ./test_assets/sizeof/int_variable.c
 ./assert.sh 8 ./test_assets/sizeof/pointer_variable.c
+./assert.sh 4 ./test_assets/sizeof/dereference.c
