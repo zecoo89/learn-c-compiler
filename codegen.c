@@ -214,6 +214,7 @@ void gen(Node *node) {
       printf("  push rax\n");
       return;
     case ND_ASSIGN:
+      printf("# ASSIGN\n");
       if(node->lhs->kind == ND_DEREF) {
         gen(node->lhs);
       } else {
@@ -221,7 +222,6 @@ void gen(Node *node) {
       }
       gen(node->rhs);
 
-      printf("# ASSIGN\n");
       printf("  pop rdi\n");
       printf("  pop rax\n");
       printf("  mov [rax], rdi\n");

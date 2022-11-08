@@ -279,20 +279,37 @@ Node *stmt() {
 
     return node;
   } else if(consume_type("int")) {
-    node = expr();
-    Node *nod = node;
-    if(node->kind == ND_ASSIGN) {
-      nod = node->lhs;
-    }
+    Token *prev = token;
+    if(token->kind == TK_IDENT && (token = token->next) && consume("[")) {
+      Token *tok = prev;
+      node = new_node(ND_LVAR, NULL, NULL);
+      node->name = dup(tok->str, tok->len);
+      Type *ty = new_type(ARRAY, NULL);
+      ty->array_size = expect_number();
+      node->type = new_type(INT, ty);
+      LVar *lvar = find_lvar(tok);
 
-    nod->type = new_type(INT, nod->type);
-    //変数に型をつける
-    LVar *lvar = find_lvar_by_node(nod);
-    lvar->type = nod->type;
+      if (lvar) {
+        error("すでに定義された変数です: %s\n", dup(tok->str, tok->len));
+      } else {
+        new_lvar(tok, node);
+      }
+      expect("]");
+    } else {
+      token = prev;
+      node = expr();
+      Node *nod = node;
+      if(node->kind == ND_ASSIGN) {
+        nod = node->lhs;
+      }
+      nod->type = new_type(INT, nod->type);
+      //変数に型をつける
+      LVar *lvar = find_lvar_by_node(nod);
+      lvar->type = nod->type;
+    }
   } else {
     node = expr();
   }
-
 
   expect(";");
   return node;
@@ -488,6 +505,7 @@ int get_type_size(Node *nod) {
       return 8;
     default:
       error("対応していない型です: %d\n", kind);
+      return -1;
   }
 }
 
@@ -497,10 +515,19 @@ void new_lvar(Token *tok, Node *node) {
   lvar->name = tok->str;
   lvar->len = tok->len;
 
-  if(locals) {
-    lvar->offset = locals->offset + 8;
+  if(node->type && node->type->kind == ARRAY) {
+    int array_size = node->type->array_size;
+    if(locals) {
+      lvar->offset = locals->offset + 8 * array_size;
+    } else {
+      lvar->offset = 8 * array_size;
+    }
   } else {
-    lvar->offset = 8;
+    if(locals) {
+      lvar->offset = locals->offset + 8;
+    } else {
+      lvar->offset = 8;
+    }
   }
 
   node->offset = lvar->offset;
